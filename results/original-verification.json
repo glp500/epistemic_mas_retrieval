@@ -1,0 +1,57 @@
+{
+  "episodes_verified": 48,
+  "unique_player_frames_per_episode": 24000,
+  "eating_and_rewards_match_all_episodes": true,
+  "exact_tests": [
+    {
+      "model": "gemma-31b",
+      "factor": "knowledge",
+      "difference": -29.833333333333314,
+      "p_exact": 0.08,
+      "permutations": 400,
+      "p_exact_holm": 0.08
+    },
+    {
+      "model": "gemma-31b",
+      "factor": "reasoning",
+      "difference": 35.166666666666686,
+      "p_exact": 0.001125,
+      "permutations": 160000,
+      "p_exact_holm": 0.0033749999999999995
+    },
+    {
+      "model": "qwen-27b",
+      "factor": "knowledge",
+      "difference": 69.66666666666667,
+      "p_exact": 0.025,
+      "permutations": 400,
+      "p_exact_holm": 0.05
+    },
+    {
+      "model": "qwen-27b",
+      "factor": "reasoning",
+      "difference": 174.33333333333334,
+      "p_exact": 1.25e-05,
+      "permutations": 160000,
+      "p_exact_holm": 5e-05
+    }
+  ],
+  "own_plant_share_episode_range": [
+    0.9968075402858012,
+    1.0
+  ],
+  "timecourse_cache_missing_total": 6,
+  "timecourse_episodes_with_missing": 6,
+  "trace_agreement_denominators": {
+    "gemma-31b": {
+      "min": 107.0,
+      "max": 556.0,
+      "sum": 3564.0
+    },
+    "qwen-27b": {
+      "min": 22.0,
+      "max": 91.0,
+      "sum": 512.0
+    }
+  }
+}

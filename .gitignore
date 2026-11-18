@@ -1,0 +1,11 @@
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.baseline/
+.cache/
+.conda/
+.venv
+.env
+*.sif
+outputs/
+logs/

@@ -1,0 +1,6 @@
+#!/bin/bash
+# Run the project's Python inside the container. Snellius's glibc is too old for dmlab2d,
+# so .venv only works in harvest.sif. Use this instead of .venv/bin/python on Snellius.
+gpu=()
+command -v nvidia-smi >/dev/null && nvidia-smi -L >/dev/null 2>&1 && gpu=(--nv)
+exec apptainer exec "${gpu[@]}" harvest.sif .venv/bin/python "$@"

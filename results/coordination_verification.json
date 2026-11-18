@@ -1,0 +1,22 @@
+{
+  "analysis_status": "exploratory; added after observing initial results",
+  "initial_counts": [
+    116,
+    116,
+    116
+  ],
+  "map_source": "meltingpot/configs/substrates/allelopathic_harvest__open.py",
+  "map_source_sha256": "b14eeb41507835d91ccf1a4c27ef20ba15c46549f04c5b49dbcb15aa7036218d",
+  "episodes": 48,
+  "validated_pre_action_majority_snapshots": 72000,
+  "final_state_included": true,
+  "convergence_threshold": null,
+  "peak_share_range": [
+    0.382183908045977,
+    0.6120689655172413
+  ],
+  "final_share_range": [
+    0.3735632183908046,
+    0.5775862068965517
+  ]
+}

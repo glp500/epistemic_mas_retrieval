@@ -1,0 +1,508 @@
+{
+  "revision": "prompts-v4-certain-sentence",
+  "review_status": {
+    "en": "provisional",
+    "nl": "provisional",
+    "fr": "provisional",
+    "es": "provisional",
+    "ar": "provisional",
+    "zh": "provisional"
+  },
+  "derived_from": "prompts-v3-live-memory",
+  "changes": [
+    "All v3 strings are unchanged in all six languages.",
+    "English only so far: eating, ripening, hedge, time_frame, time_horizon, false_rule, the sham_ sentences, paraphrases, probe. A non-English cell that needs them stops with an error until they are translated.",
+    "Every sham sentence is true and irrelevant to play; each sits where its real sentence would.",
+    "The certain arm now opens the rules with its own sentence (decision 6B), in all six languages, so the v4 baseline is the v3 prompt plus that one line."
+  ],
+  "languages": {
+    "en": {
+      "common": "You play Allelopathic Harvest. Maximize your total episode reward. Only ripe berries can be eaten. Eating your preferred color gives +2; any other color gives +1. Planting changes only unripe patches to a different color; it does not change ripe patches. Planting beams extend 3 cells forward and have a 2-frame cooldown. Zap beams have range 3 and radius 1; sanctions can cost 10 reward and remove a player temporarily. Public avatar color is not their private taste. Your memory of recent frames is listed below. Coordinates are relative to your facing: dx is right, dy is forward. The view spans dx=-5..5 and dy=-1..9. Only fully visible objects are listed; an omission does not mean an empty cell.",
+      "taste": "Your preferred color: {taste}.",
+      "alive": "You are {status}.",
+      "alive_words": [
+        "inactive",
+        "active"
+      ],
+      "berries": "Visible patches (dx,dy;color,ripeness): {items}.",
+      "avatars": "Visible avatars (dx,dy;public color): {items}.",
+      "self": "self",
+      "none": "none verified",
+      "target": "Designated patch: dx={dx}, dy={dy}.",
+      "hidden": "The designated target is outside the current view. Its color is not supplied.",
+      "instruction": "Choose one answer code. Reply only with that code.",
+      "colors": {
+        "red": "red",
+        "green": "green",
+        "blue": "blue",
+        "neutral": "neutral gray"
+      },
+      "ripeness": [
+        "unripe",
+        "ripe"
+      ],
+      "questions": {
+        "P1": "What color is the designated patch?",
+        "P2": "Is the designated patch ripe?",
+        "R2": "If you consume a ripe berry of the designated color, what berry reward do you receive, excluding sanctions? The target itself need not currently be ripe.",
+        "A1": "Ignoring beam range, obstruction and cooldown, would firing a red planting beam at this patch change its color to red? Assume the beam reaches it."
+      },
+      "unknown": "insufficient evidence",
+      "yes": "yes",
+      "no": "no",
+      "action": "Choose your next action to maximize total episode reward.",
+      "actions": [
+        "do nothing",
+        "move forward",
+        "move backward",
+        "step left",
+        "step right",
+        "turn left",
+        "turn right",
+        "fire zap",
+        "plant red",
+        "plant green",
+        "plant blue"
+      ],
+      "target_facts": "Designated patch facts: color={color}; ripeness={ripeness}.",
+      "image_note": "The image shows your current view from above: you are the avatar in the middle column, second row from the bottom, facing up. Each square is one cell. The designated patch is outlined in yellow.",
+      "no_scene": "Patch colors, ripeness and avatars are not listed in the text.",
+      "memory_header": "Memory of your last {k} frames (t-1 = previous frame):",
+      "memory_empty": "Memory: none yet.",
+      "memory_line": "t-{ago}: you chose {action}. Seen: {events}.",
+      "nothing": "nothing",
+      "events": {
+        "ate_self": "you ate a berry (color: {color})",
+        "ate_other": "a neighbor ate a berry (color: {color})",
+        "planted_other": "a neighbor planted a patch (color: {color})",
+        "zapped_you": "a neighbor zapped you",
+        "zap_other": "a neighbor zapped another player"
+      },
+      "note": "Describe in one sentence what is happening around you.",
+      "actions_open": "Available actions: {items}.",
+      "instruction_open": "Reply with exactly one action from this list and nothing else.",
+      "instruction_retry": "Copy exactly one action name from the list above. Do not add any other words.",
+      "certain": "These rules are correct:",
+      "hedge": "These rules are believed to be correct:",
+      "time_frame": "Frame {frame}.",
+      "time_horizon": "Frame {frame} of {horizon} ({left} frames left).",
+      "false_rule": "You eat a ripe berry by standing next to it; stepping onto it does nothing.",
+      "probe": {
+        "rating": "How well do you know how to get reward in this game? Reply with one digit from 1 (not at all) to 7 (completely).",
+        "explain": "Explain in two sentences how you get reward in this game.",
+        "diagnostic": [
+          {
+            "role": "manipulation",
+            "question": "How do you eat a ripe berry?",
+            "options": [
+              "step onto it",
+              "stand next to it",
+              "fire a zap at it",
+              "plant on it"
+            ],
+            "correct": 0,
+            "false_rule": 1
+          },
+          {
+            "role": "manipulation",
+            "question": "Which unripe patches ripen fastest?",
+            "options": [
+              "the most common color",
+              "the rarest color",
+              "all colors alike"
+            ],
+            "correct": 0
+          },
+          {
+            "role": "comprehension",
+            "question": "What can a planting beam change?",
+            "options": [
+              "unripe patches",
+              "ripe patches",
+              "any patch"
+            ],
+            "correct": 0
+          }
+        ],
+        "diagnostic_instruction": "Reply with exactly one option from this list and nothing else: {items}.",
+        "confidence": "How sure are you of that answer? Reply with one digit from 1 (not at all) to 7 (completely).",
+        "certainty_check": "How sure are you that the rules you were given are correct? Reply with one digit from 1 (not at all) to 7 (completely).",
+        "time_check": "How many frames are left in this game? Reply with a number, or with the word unknown."
+      },
+      "eating": "To eat a ripe berry, step onto its cell.",
+      "ripening": "Unripe patches ripen faster when more patches on the map have the same color.",
+      "sham_knowledge": "This game was first described in a 2020 research paper. It belongs to a collection of test environments for groups of learning agents.",
+      "sham_certainty": "These rules are listed in no particular order:",
+      "sham_time": "The game is in progress.",
+      "sham_false_rule": "A ripe berry looks different from an unripe berry of the same color.",
+      "paraphrases": [
+        {
+          "eating": "You eat a ripe berry by moving onto the cell it is on.",
+          "ripening": "The more patches of a color there are on the map, the faster unripe patches of that color ripen.",
+          "sham_knowledge": "A research paper introduced this game in 2020. It is one of a set of test environments for groups of learning agents.",
+          "certain": "These rules are true:",
+          "hedge": "These rules are thought to be correct:",
+          "sham_certainty": "The order of these rules has no meaning:",
+          "time_frame": "Current frame: {frame}.",
+          "time_horizon": "Current frame: {frame} out of {horizon}, with {left} frames remaining.",
+          "sham_time": "The game is currently running.",
+          "false_rule": "Standing beside a ripe berry is how you eat it; moving onto its cell has no effect.",
+          "sham_false_rule": "Ripe and unripe berries of one color do not look the same."
+        },
+        {
+          "eating": "A ripe berry is eaten when you walk onto its cell.",
+          "ripening": "A color's unripe patches ripen faster if that color covers more patches on the map.",
+          "sham_knowledge": "This game comes from a research paper published in 2020. It is part of a suite of test environments for groups of learning agents.",
+          "certain": "These rules are accurate:",
+          "hedge": "These rules are understood to be accurate:",
+          "sham_certainty": "These rules are not given in any special order:",
+          "time_frame": "This is frame {frame}.",
+          "time_horizon": "This is frame {frame} of {horizon}; {left} frames are left.",
+          "sham_time": "Play is under way.",
+          "false_rule": "A ripe berry is eaten by standing right next to it; walking onto its cell does nothing.",
+          "sham_false_rule": "An unripe berry and a ripe berry of one color differ in appearance."
+        }
+      ]
+    },
+    "nl": {
+      "common": "Je speelt Allelopathic Harvest. Maximaliseer je totale beloning over de episode. Alleen rijpe bessen kunnen worden gegeten. Je voorkeurskleur eten levert +2 op; elke andere kleur +1. Een plantstraal verandert alleen onrijpe vakken naar een andere kleur, geen rijpe vakken. De plantstraal reikt 3 vakken vooruit en heeft een afkoeltijd van 2 frames. De strafstraal reikt 3 vakken en heeft een radius van 1 vak; sancties kunnen 10 beloningspunten kosten en een speler tijdelijk verwijderen. De zichtbare avatarkleur onthult niet de persoonlijke voorkeur. Je geheugen van de laatste frames staat hieronder. Coördinaten zijn relatief aan je kijkrichting: dx naar rechts, dy vooruit. Het zicht beslaat dx=-5..5 en dy=-1..9. Alleen volledig zichtbare objecten worden vermeld; een weglating betekent niet dat een vak leeg is.",
+      "taste": "Je voorkeurskleur: {taste}.",
+      "alive": "Je bent momenteel {status}.",
+      "alive_words": [
+        "inactief",
+        "actief"
+      ],
+      "berries": "Zichtbare vakken (dx,dy;kleur,rijpheid): {items}.",
+      "avatars": "Zichtbare avatars (dx,dy;zichtbare kleur): {items}.",
+      "self": "jij",
+      "none": "geen bevestigd",
+      "target": "Aangewezen vak: dx={dx}, dy={dy}.",
+      "hidden": "Het aangewezen vak ligt buiten het huidige zicht. De kleur wordt niet gegeven.",
+      "instruction": "Kies één antwoordcode. Antwoord alleen met die code.",
+      "colors": {
+        "red": "rood",
+        "green": "groen",
+        "blue": "blauw",
+        "neutral": "neutraal grijs"
+      },
+      "ripeness": [
+        "onrijp",
+        "rijp"
+      ],
+      "questions": {
+        "P1": "Welke kleur heeft het aangewezen vak?",
+        "P2": "Is het aangewezen vak rijp?",
+        "R2": "Als je een rijpe bes van de aangewezen kleur eet, welke bessenbeloning krijg je, zonder sancties? Het vak zelf hoeft nu niet rijp te zijn.",
+        "A1": "Als je, ongeacht bereik, obstakels en afkoeltijd, een rode plantstraal op dit vak afvuurt, verandert de kleur dan in rood? Neem aan dat de straal het vak bereikt."
+      },
+      "unknown": "onvoldoende bewijs",
+      "yes": "ja",
+      "no": "nee",
+      "action": "Kies je volgende actie om de totale episodebeloning te maximaliseren.",
+      "actions": [
+        "niets doen",
+        "vooruit bewegen",
+        "achteruit bewegen",
+        "stap links",
+        "stap rechts",
+        "links draaien",
+        "rechts draaien",
+        "strafstraal schieten",
+        "rood planten",
+        "groen planten",
+        "blauw planten"
+      ],
+      "target_facts": "Feiten over het aangewezen vak: kleur={color}; rijpheid={ripeness}.",
+      "image_note": "De afbeelding toont je huidige zicht van bovenaf: jij bent de avatar in de middelste kolom, op de tweede rij van onderen, met je gezicht naar boven. Elk vierkant is één vak. Het aangewezen vak is geel omrand.",
+      "no_scene": "Kleuren en rijpheid van vakken en avatars worden niet in de tekst vermeld.",
+      "memory_header": "Geheugen van je laatste {k} frames (t-1 = vorige frame):",
+      "memory_empty": "Geheugen: nog niets.",
+      "memory_line": "t-{ago}: je koos {action}. Gezien: {events}.",
+      "nothing": "niets",
+      "events": {
+        "ate_self": "je at een bes (kleur: {color})",
+        "ate_other": "een buur at een bes (kleur: {color})",
+        "planted_other": "een buur plantte een vak (kleur: {color})",
+        "zapped_you": "een buur raakte je met de strafstraal",
+        "zap_other": "een buur raakte een andere speler met de strafstraal"
+      },
+      "note": "Beschrijf in één zin wat er om je heen gebeurt.",
+      "actions_open": "Beschikbare acties: {items}.",
+      "instruction_open": "Antwoord met precies één actie uit deze lijst en niets anders.",
+      "instruction_retry": "Kopieer precies één actienaam uit de lijst hierboven. Voeg geen andere woorden toe.",
+      "certain": "Deze regels zijn correct:"
+    },
+    "fr": {
+      "common": "Vous jouez à Allelopathic Harvest. Maximisez votre récompense totale sur l'épisode. Seules les baies mûres peuvent être mangées. Manger votre couleur préférée rapporte +2 ; toute autre couleur rapporte +1. Planter ne change que les parcelles non mûres en une autre couleur ; cela ne change pas les parcelles mûres. Le rayon de plantation porte à 3 cases vers l'avant et a un temps de recharge de 2 images. Le rayon de sanction a une portée de 3 et un rayon de 1 ; les sanctions peuvent coûter 10 points de récompense et retirer temporairement un joueur. La couleur publique d'un avatar n'indique pas sa préférence privée. Votre mémoire des dernières images est indiquée ci-dessous. Les coordonnées sont relatives à votre orientation : dx vers la droite, dy vers l'avant. La vue couvre dx=-5..5 et dy=-1..9. Seuls les objets entièrement visibles sont listés ; une omission ne signifie pas qu'une case est vide.",
+      "taste": "Votre couleur préférée : {taste}.",
+      "alive": "Vous êtes {status}.",
+      "alive_words": [
+        "inactif",
+        "actif"
+      ],
+      "berries": "Parcelles visibles (dx,dy;couleur,maturité) : {items}.",
+      "avatars": "Avatars visibles (dx,dy;couleur publique) : {items}.",
+      "self": "vous",
+      "none": "aucun vérifié",
+      "target": "Parcelle désignée : dx={dx}, dy={dy}.",
+      "hidden": "La parcelle désignée est hors de la vue actuelle. Sa couleur n'est pas fournie.",
+      "instruction": "Choisissez un code de réponse. Répondez uniquement avec ce code.",
+      "colors": {
+        "red": "rouge",
+        "green": "vert",
+        "blue": "bleu",
+        "neutral": "gris neutre"
+      },
+      "ripeness": [
+        "non mûre",
+        "mûre"
+      ],
+      "questions": {
+        "P1": "De quelle couleur est la parcelle désignée ?",
+        "P2": "La parcelle désignée est-elle mûre ?",
+        "R2": "Si vous mangez une baie mûre de la couleur désignée, quelle récompense obtenez-vous, hors sanctions ? La parcelle elle-même n'a pas besoin d'être mûre.",
+        "A1": "En ignorant la portée, les obstacles et le temps de recharge, tirer un rayon de plantation rouge sur cette parcelle la rendrait-il rouge ? Supposez que le rayon l'atteint."
+      },
+      "unknown": "preuves insuffisantes",
+      "yes": "oui",
+      "no": "non",
+      "action": "Choisissez votre prochaine action pour maximiser la récompense totale de l'épisode.",
+      "actions": [
+        "ne rien faire",
+        "avancer",
+        "reculer",
+        "pas à gauche",
+        "pas à droite",
+        "tourner à gauche",
+        "tourner à droite",
+        "tirer le rayon de sanction",
+        "planter rouge",
+        "planter vert",
+        "planter bleu"
+      ],
+      "target_facts": "Faits sur la parcelle désignée : couleur={color} ; maturité={ripeness}.",
+      "image_note": "L'image montre votre vue actuelle vue de dessus : vous êtes l'avatar de la colonne du milieu, deuxième rangée en partant du bas, tourné vers le haut. Chaque carré est une case. La parcelle désignée est entourée en jaune.",
+      "no_scene": "Les couleurs, la maturité des parcelles et les avatars ne sont pas listés dans le texte.",
+      "memory_header": "Mémoire de vos {k} dernières images (t-1 = image précédente) :",
+      "memory_empty": "Mémoire : rien pour l'instant.",
+      "memory_line": "t-{ago} : vous avez choisi {action}. Vu : {events}.",
+      "nothing": "rien",
+      "events": {
+        "ate_self": "vous avez mangé une baie (couleur : {color})",
+        "ate_other": "un voisin a mangé une baie (couleur : {color})",
+        "planted_other": "un voisin a planté une parcelle (couleur : {color})",
+        "zapped_you": "un voisin vous a touché avec le rayon de sanction",
+        "zap_other": "un voisin a touché un autre joueur avec le rayon de sanction"
+      },
+      "note": "Décrivez en une phrase ce qui se passe autour de vous.",
+      "actions_open": "Actions disponibles : {items}.",
+      "instruction_open": "Répondez avec exactement une action de cette liste et rien d'autre.",
+      "instruction_retry": "Copiez exactement un nom d'action de la liste ci-dessus. N'ajoutez aucun autre mot.",
+      "certain": "Ces règles sont correctes :"
+    },
+    "es": {
+      "common": "Juegas a Allelopathic Harvest. Maximiza la recompensa total del episodio. Solo se pueden comer bayas maduras. Comer tu color preferido da +2; cualquier otro da +1. El haz de plantación solo cambia parcelas inmaduras a un color distinto; no cambia parcelas maduras. El haz de plantación alcanza 3 casillas hacia delante y tiene un enfriamiento de 2 fotogramas. El haz de castigo tiene alcance 3 y radio 1; las sanciones pueden restar 10 puntos y retirar temporalmente a un jugador. El color público del avatar no indica su preferencia privada. Tu memoria de los fotogramas recientes aparece abajo. Las coordenadas son relativas a tu orientación: dx hacia la derecha y dy hacia delante. La vista abarca dx=-5..5 y dy=-1..9. Solo se enumeran objetos completamente visibles; una omisión no implica una casilla vacía.",
+      "taste": "Tu color preferido: {taste}.",
+      "alive": "Actualmente estás {status}.",
+      "alive_words": [
+        "inactivo",
+        "activo"
+      ],
+      "berries": "Parcelas visibles (dx,dy;color,madurez): {items}.",
+      "avatars": "Avatares visibles (dx,dy;color público): {items}.",
+      "self": "tú",
+      "none": "ninguno verificado",
+      "target": "Parcela designada: dx={dx}, dy={dy}.",
+      "hidden": "La parcela designada está fuera de la vista actual. No se proporciona su color.",
+      "instruction": "Elige un código de respuesta. Responde solo con ese código.",
+      "colors": {
+        "red": "rojo",
+        "green": "verde",
+        "blue": "azul",
+        "neutral": "gris neutro"
+      },
+      "ripeness": [
+        "inmadura",
+        "madura"
+      ],
+      "questions": {
+        "P1": "¿De qué color es la parcela designada?",
+        "P2": "¿Está madura la parcela designada?",
+        "R2": "Si consumes una baya madura del color designado, ¿qué recompensa por la baya recibes, excluyendo sanciones? La parcela no tiene que estar madura ahora.",
+        "A1": "Sin considerar alcance, obstáculos ni enfriamiento, si disparas un haz de plantación rojo a esta parcela, ¿cambiaría su color a rojo? Supón que el haz llega a ella."
+      },
+      "unknown": "evidencia insuficiente",
+      "yes": "sí",
+      "no": "no",
+      "action": "Elige tu siguiente acción para maximizar la recompensa total del episodio.",
+      "actions": [
+        "no hacer nada",
+        "avanzar",
+        "retroceder",
+        "paso a la izquierda",
+        "paso a la derecha",
+        "girar a la izquierda",
+        "girar a la derecha",
+        "disparar castigo",
+        "plantar rojo",
+        "plantar verde",
+        "plantar azul"
+      ],
+      "target_facts": "Datos de la parcela designada: color={color}; madurez={ripeness}.",
+      "image_note": "La imagen muestra tu vista actual desde arriba: eres el avatar de la columna central, en la segunda fila desde abajo, mirando hacia arriba. Cada cuadrado es una casilla. La parcela designada está recuadrada en amarillo.",
+      "no_scene": "El texto no enumera los colores ni la madurez de las parcelas ni los avatares.",
+      "memory_header": "Memoria de tus últimos {k} fotogramas (t-1 = fotograma anterior):",
+      "memory_empty": "Memoria: nada todavía.",
+      "memory_line": "t-{ago}: elegiste {action}. Visto: {events}.",
+      "nothing": "nada",
+      "events": {
+        "ate_self": "comiste una baya (color: {color})",
+        "ate_other": "un vecino comió una baya (color: {color})",
+        "planted_other": "un vecino plantó una parcela (color: {color})",
+        "zapped_you": "un vecino te alcanzó con el haz de castigo",
+        "zap_other": "un vecino alcanzó a otro jugador con el haz de castigo"
+      },
+      "note": "Describe en una frase lo que está pasando a tu alrededor.",
+      "actions_open": "Acciones disponibles: {items}.",
+      "instruction_open": "Responde solo con una acción de esta lista y nada más.",
+      "instruction_retry": "Copia exactamente un nombre de acción de la lista anterior. No añadas ninguna otra palabra.",
+      "certain": "Estas reglas son correctas:"
+    },
+    "ar": {
+      "common": "أنت تلعب Allelopathic Harvest. هدفك تعظيم مجموع مكافآت الحلقة. يمكن أكل الثمار الناضجة فقط. أكل لونك المفضل يمنح +2 وأي لون آخر يمنح +1. شعاع الزراعة يغير لون الرقع غير الناضجة إلى لون مختلف فقط، ولا يغير الرقع الناضجة. يمتد شعاع الزراعة 3 خلايا إلى الأمام وفترة تبريده إطاران. مدى شعاع العقاب 3 خلايا ونصف قطره خلية واحدة؛ قد تخصم العقوبات 10 نقاط وتزيل اللاعب مؤقتا. لون الشخصية الظاهر لا يدل على تفضيلها الخاص. ذاكرتك للإطارات الأخيرة مذكورة أدناه. الإحداثيات بالنسبة إلى اتجاهك: dx إلى اليمين وdy إلى الأمام. مجال الرؤية dx=-5..5 وdy=-1..9. نذكر الأجسام المرئية بالكامل فقط؛ عدم ذكر جسم لا يعني أن الخلية فارغة.",
+      "taste": "لونك المفضل: {taste}.",
+      "alive": "أنت حاليا {status}.",
+      "alive_words": [
+        "غير نشط",
+        "نشط"
+      ],
+      "berries": "الرقع المرئية (dx,dy;اللون,النضج): {items}.",
+      "avatars": "الشخصيات المرئية (dx,dy;اللون الظاهر): {items}.",
+      "self": "أنت",
+      "none": "لا أجسام مؤكدة",
+      "target": "الرقعة المحددة: dx={dx}، dy={dy}.",
+      "hidden": "الرقعة المحددة خارج مجال الرؤية الحالي. لم يقدم لونها.",
+      "instruction": "اختر رمز إجابة واحدا. أجب بهذا الرمز فقط.",
+      "colors": {
+        "red": "أحمر",
+        "green": "أخضر",
+        "blue": "أزرق",
+        "neutral": "رمادي محايد"
+      },
+      "ripeness": [
+        "غير ناضجة",
+        "ناضجة"
+      ],
+      "questions": {
+        "P1": "ما لون الرقعة المحددة؟",
+        "P2": "هل الرقعة المحددة ناضجة؟",
+        "R2": "إذا أكلت ثمرة ناضجة من اللون المحدد، فما مكافأة الثمرة التي تتلقاها دون احتساب العقوبات؟ ليس من الضروري أن تكون الرقعة المحددة ناضجة الآن.",
+        "A1": "بصرف النظر عن مدى الشعاع والعوائق وفترة التبريد، إذا أُطلق شعاع زراعة أحمر على هذه الرقعة، فهل سيتغير لونها إلى الأحمر؟ افترض أن الشعاع يصل إليها."
+      },
+      "unknown": "أدلة غير كافية",
+      "yes": "نعم",
+      "no": "لا",
+      "action": "اختر فعلك التالي لتعظيم مجموع مكافآت الحلقة.",
+      "actions": [
+        "لا تفعل شيئا",
+        "تحرك للأمام",
+        "تحرك للخلف",
+        "خطوة لليسار",
+        "خطوة لليمين",
+        "استدر لليسار",
+        "استدر لليمين",
+        "أطلق شعاع العقاب",
+        "ازرع الأحمر",
+        "ازرع الأخضر",
+        "ازرع الأزرق"
+      ],
+      "target_facts": "حقائق الرقعة المحددة: اللون={color}؛ النضج={ripeness}.",
+      "image_note": "تُظهر الصورة مجال رؤيتك الحالي من الأعلى: أنت الشخصية في العمود الأوسط، في الصف الثاني من الأسفل، ووجهك إلى الأعلى. كل مربع خلية واحدة. الرقعة المحددة محاطة بإطار أصفر.",
+      "no_scene": "لا يذكر النص ألوان الرقع ولا نضجها ولا الشخصيات.",
+      "memory_header": "ذاكرة آخر {k} إطارات (t-1 = الإطار السابق):",
+      "memory_empty": "الذاكرة: لا شيء بعد.",
+      "memory_line": "t-{ago}: اخترت {action}. شوهد: {events}.",
+      "nothing": "لا شيء",
+      "events": {
+        "ate_self": "أكلت ثمرة (اللون: {color})",
+        "ate_other": "أكل لاعب مجاور ثمرة (اللون: {color})",
+        "planted_other": "زرع لاعب مجاور رقعة (اللون: {color})",
+        "zapped_you": "أصابك لاعب مجاور بشعاع العقاب",
+        "zap_other": "أصاب لاعب مجاور لاعبا آخر بشعاع العقاب"
+      },
+      "note": "صف في جملة واحدة ما يحدث حولك.",
+      "actions_open": "الأفعال المتاحة: {items}.",
+      "instruction_open": "أجب بفعل واحد فقط من هذه القائمة ولا شيء غيره.",
+      "instruction_retry": "انسخ اسم فعل واحد بالضبط من القائمة أعلاه. لا تضف أي كلمات أخرى.",
+      "certain": "هذه القواعد صحيحة:"
+    },
+    "zh": {
+      "common": "你正在玩 Allelopathic Harvest。目标是最大化整局累计奖励。只有成熟的浆果可以食用。食用你偏好的颜色获得+2，其他颜色获得+1。种植光束只能将未成熟的浆果地块改为另一种颜色，不能改变成熟地块。种植光束向前延伸3格，冷却时间为2帧。惩罚光束射程为3格、半径为1格；制裁可能扣除10点奖励并暂时移除玩家。角色公开颜色不代表其私人偏好。下面列出你对最近几帧的记忆。坐标相对于你的朝向：dx为向右，dy为向前。视野范围为dx=-5..5、dy=-1..9。只列出完全可见的对象；未列出不代表空格。",
+      "taste": "你偏好的颜色：{taste}。",
+      "alive": "你当前{status}。",
+      "alive_words": [
+        "未激活",
+        "激活"
+      ],
+      "berries": "可见地块(dx,dy;颜色,成熟状态)：{items}。",
+      "avatars": "可见角色(dx,dy;公开颜色)：{items}。",
+      "self": "自己",
+      "none": "无已确认对象",
+      "target": "指定地块：dx={dx}，dy={dy}。",
+      "hidden": "指定地块位于当前视野之外，未提供其颜色。",
+      "instruction": "选择一个答案代码，只回复该代码。",
+      "colors": {
+        "red": "红色",
+        "green": "绿色",
+        "blue": "蓝色",
+        "neutral": "中性灰色"
+      },
+      "ripeness": [
+        "未成熟",
+        "成熟"
+      ],
+      "questions": {
+        "P1": "指定地块是什么颜色？",
+        "P2": "指定地块是否成熟？",
+        "R2": "假设你食用一颗指定颜色的成熟浆果，不计制裁，你获得多少浆果奖励？指定地块本身此刻不必成熟。",
+        "A1": "忽略光束射程、阻挡和冷却，如果向这个地块发射红色种植光束，它的颜色会变成红色吗？假设光束可以到达它。"
+      },
+      "unknown": "证据不足",
+      "yes": "会",
+      "no": "不会",
+      "action": "选择下一步行动以最大化整局累计奖励。",
+      "actions": [
+        "不动",
+        "前进",
+        "后退",
+        "左移",
+        "右移",
+        "左转",
+        "右转",
+        "发射惩罚光束",
+        "种植红色",
+        "种植绿色",
+        "种植蓝色"
+      ],
+      "target_facts": "指定地块的已知信息：颜色={color}；成熟状态={ripeness}。",
+      "image_note": "图像显示你当前的俯视视野：你是位于中间一列、倒数第二行、面朝上方的角色。每个方格是一个格子。指定地块用黄色方框标出。",
+      "no_scene": "文本中未列出地块的颜色、成熟状态和角色。",
+      "memory_header": "你最近{k}帧的记忆（t-1 = 上一帧）：",
+      "memory_empty": "记忆：暂无。",
+      "memory_line": "t-{ago}：你选择了{action}。看到：{events}。",
+      "nothing": "无",
+      "events": {
+        "ate_self": "你吃了一个浆果（颜色：{color}）",
+        "ate_other": "一个邻近玩家吃了一个浆果（颜色：{color}）",
+        "planted_other": "一个邻近玩家种植了一个地块（颜色：{color}）",
+        "zapped_you": "一个邻近玩家用惩罚光束击中了你",
+        "zap_other": "一个邻近玩家用惩罚光束击中了另一名玩家"
+      },
+      "note": "用一句话描述你周围正在发生什么。",
+      "actions_open": "可用行动：{items}。",
+      "instruction_open": "只回复列表中的一个行动，不要回复其他内容。",
+      "instruction_retry": "从上面的列表中原样复制一个行动名称。不要添加任何其他文字。",
+      "certain": "这些规则是正确的："
+    }
+  }
+}

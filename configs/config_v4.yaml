@@ -1,0 +1,152 @@
+# v4 protocol: reasoning, rule knowledge, certainty, time awareness, model size.
+# Built on config_v3.yaml, which stays frozen. Plan: docs/v4/implementation-plan.md.
+# Values marked PROVISIONAL wait for the author's decision (docs/v4/decisions.md) or the pilot.
+protocol: live-v4
+prompts: prompts_v4.json
+translation_status: provisional
+substrate: allelopathic_harvest__open
+episode_frames: 1500                # 5 Nov, author: 3 seeds at 1,500 frames fit the 100,000 SBU budget (decisions.md)
+players: 16
+languages: [en, nl, fr, es, ar, zh]
+modality: text
+pilot_seeds: [500]
+pilot_steps: 500
+smoke_steps: 50
+seeds: [501, 502, 503, 504, 505]    # blocks use the first 3 unless they set seed_count: 5
+language_seeds: [401, 402, 403]     # block D: the v3 main seeds
+device: cuda
+max_prompt_tokens: 4096
+local_files_only: true
+storage:
+  output_root: outputs/v4           # set HARVEST_OUTPUT to project space on Snellius, not scratch
+
+models:
+  # Large models only (author's decision, 2 Nov 2026). Neither fits a 40 GB A100, so every block runs on H100.
+  # Pinned revisions; sizes are total parameters on Hugging Face. Both dense.
+  # thinking: open/close delimit the thought, resume closes a thought cut off by the
+  # budget, end ends a turn. Qwen's template opens the thought in the prompt.
+  qwen-27b:                         # 27.78B; weights 55.6 GB
+    model_id: Qwen/Qwen3.5-27B
+    revision: fc05daec18b0a78c049392ed2e771dde82bdf654
+    dtype: bfloat16
+    attention: sdpa
+    batch_size: 16                  # Transformers only; vLLM schedules all players together
+    thinking: {open: "<think>", close: "</think>", resume: "\n</think>\n\n", end: "<|im_end|>"}
+    # Model card, general tasks (R2, sampling). vLLM has presence_penalty; harvest/llm.py adds it for Transformers.
+    decoding: {do_sample: true, temperature: 0.7, top_p: 0.8, top_k: 20, min_p: 0.0, presence_penalty: 1.5}
+    thinking_decoding: {do_sample: true, temperature: 1.0, top_p: 0.95, top_k: 20, min_p: 0.0, presence_penalty: 1.5}
+    vllm:                           # backend (4 Nov): these keys go to vllm.LLM. Remove the section to use Transformers
+      max_model_len: 6144           # 4,096 prompt limit + 1,024 thought + answer, with room
+      gpu_memory_utilization: 0.9
+      limit_mm_per_prompt: {image: 0, video: 0}  # text only: no memory reserved for images
+      max_num_seqs: 128             # hybrid model: one state block per running request; the default 1,024 exceeds the 560 an H100 holds (5 Nov)
+  gemma-31b:                        # 31.27B; weights 62.5 GB; the cache is large, see docs/v4/run-strategy.md
+    model_id: google/gemma-4-31B-it
+    revision: 842da3794eaa0b77d5f08bae87a17459d91ff475
+    dtype: bfloat16
+    attention: sdpa
+    batch_size: 8                   # measure in the speed test, then raise or lower
+    # device_map: auto              # spreads the model over two GPUs: use with sbatch --gpus=2, at twice the cost
+    thinking: {open: "<|channel>thought", close: "<channel|>", resume: "\n<channel|>", end: "<turn|>"}
+    # Model card: one setting for every use, thinking on or off (R2, sampling).
+    decoding: {do_sample: true, temperature: 1.0, top_p: 0.95, top_k: 64}
+    vllm:                           # backend (4 Nov): these keys go to vllm.LLM. Remove the section to use Transformers
+      max_model_len: 6144           # 4,096 prompt limit + 1,024 thought + answer, with room
+      gpu_memory_utilization: 0.9
+      limit_mm_per_prompt: {image: 0}  # text only: no memory reserved for images
+
+reasoning:
+  budget_tokens: 1024               # R1, author 4 Nov: cap, then close the thought
+  answer_tokens: 16                 # after a thought is closed; same as actions.max_new_tokens
+
+conditions:                         # every level of every factor; the first level is the baseline
+  reasoning: ["off", "on"]
+  knowledge: [facts, sham, eating, ripening, mechanism]   # mechanism = eating + ripening; sham = true but irrelevant sentences
+  certainty: [certain, sham, hedged]
+  time: [none, sham, frame, horizon]
+  false_rule: [none, sham, once, three]
+  wording: [0, 1, 2]                # 0 = main text, 1 and 2 = paraphrases
+
+chosen_prompt: null                 # set after the pilot, by the rule in docs/v4/decisions.md; blocks B and H refuse until then
+
+blocks:
+  # Blocks B, H and F reuse block A's matching episodes as their control (shared_with), so it is paid for once.
+  A: {doc: "knowledge", factors: {knowledge: [sham, eating, ripening, mechanism], reasoning: ["off", "on"]}, models: [qwen-27b, gemma-31b], gpu: gpu_h100}
+  B: {doc: "time", use_chosen_prompt: true, shared_with: A, factors: {time: [none, frame, horizon], reasoning: ["off", "on"]}, models: [qwen-27b, gemma-31b], gpu: gpu_h100}
+  H: {doc: "certainty", use_chosen_prompt: true, shared_with: A, factors: {certainty: [certain, hedged], reasoning: ["off", "on"]}, models: [qwen-27b, gemma-31b], gpu: gpu_h100}
+  F: {doc: "false rule", base: {knowledge: sham}, shared_with: A, factors: {false_rule: [none, once, three], reasoning: ["off", "on"]}, models: [qwen-27b, gemma-31b], gpu: gpu_h100}
+  D: {doc: "language", languages: [en, nl, fr, es, ar, zh], seeds: language_seeds, factors: {reasoning: ["off", "on"]}, models: [qwen-27b, gemma-31b], gpu: gpu_h100}
+wall_time: {gpu_h100: "5-00:00:00"}   # partition limit; lower to 1.2 x the measured episode time after the speed test
+
+logging:
+  full_prompts: true                # prompts.jsonl.gz: prompts, thoughts, scene and memory per decision
+
+# Unchanged from v3 from here on.
+actions:
+  format: open_listed
+  order: shuffled
+  max_new_tokens: 16
+  unmatched: retry_once_then_noop
+  inactive: noop
+memory:
+  frames: 10
+  contents: [own_actions, events_in_view]
+  notes_in_memory: false
+notes:
+  every_frames: 100
+  instruction: note
+  decoding: model                   # sampled with the model's thinking-off setting, like actions (R2)
+  max_new_tokens: 60
+  thinking: false
+  language_check: script
+scenario:
+  ripe_in_view: [none, other_colour, own_colour]
+  neighbours_visible: ["0", "1-2", "3+"]
+  zap_seen: [no, yes]
+  phase: [[0, 499], [500, 999], [1000, 1499]]   # thirds of the 1,500-frame episode
+  min_count_per_language: 20
+  merge_rule: none
+outcomes:
+  welfare: sum of delivered rewards over all 16 players and the whole episode
+  inequality: Gini of per-player berry reward over the episode; report 0/0 (nobody ate), never drop
+  sanctions: zaps given and received, removals, per player
+  cooperation:
+    majority_colour: whole_map
+    cooperate: [plant_majority_colour]
+    defect: [zap, eat_without_planting]
+analysis:
+  unit: episode
+  end_game_share: 0.2               # M3, author 4 Nov: last 20% of frames
+  primary: berries_eaten            # author's decision, 3 Nov
+  secondary: [welfare, gini_berry, cooperate_share_of_plants, defector_share, zap_rate, free_rider_share, removals]
+                                    # defector_share (5 Nov, author): share of players who zapped at least once or ate without ever replanting
+  comparisons:                      # the only tests (A1), each per model; everything else is descriptive
+                                    # confirmatory (5 Nov): Holm covers the primary outcome of these only; the rest are unadjusted
+    - {blocks: [A], factor: knowledge, a: sham, b: eating}
+    - {blocks: [A], factor: knowledge, a: sham, b: ripening}
+    - {blocks: [A], factor: knowledge, a: sham, b: mechanism, confirmatory: true}
+    - {blocks: [A], factor: reasoning, a: "off", b: "on", confirmatory: true}
+    - {blocks: [A, B], factor: time, a: none, b: horizon}
+    - {blocks: [B], factor: time, a: frame, b: horizon}
+    - {blocks: [A, H], factor: certainty, a: certain, b: hedged}
+    - {blocks: [A, F], factor: false_rule, a: none, b: once}
+    - {blocks: [F], factor: false_rule, a: once, b: three}
+  resamples: 20000
+  h1: {equivalence_margin: 0.05}    # block D: relative to the English mean; raw differences if that mean <= 0
+  mechanism_keywords:               # M1: validate by hand on ~100 traces; other languages after translation
+    en:
+      eating: ["step onto", "stepping onto", "walk onto", "walking onto", "move onto", "moving onto", "step on", "reach the berry"]
+      growth: ["ripen faster", "ripens faster", "ripen more", "more patches", "most common color", "fastest"]
+      preference: ["preferred color", "own color", "my color", "+2"]
+screen:                             # fixed-state test: every cell, on the same saved states
+  states: 30
+  orders_per_state: 2               # two action-list orders per state; the baseline's gap between them is the noise floor
+  probe_states: 8
+  min_beyond_sham: 0.05             # a level moves on if it changes more decisions than its sham by this much, in all wordings
+probe:
+  states_per_episode: 8             # own-colour ripe berry in view, evenly spaced over the episode
+  max_new_tokens: 80
+  scenario: {ripe_in_view: own_colour}
+embedders:
+  Qwen/Qwen3-Embedding-0.6B: 97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3
+notes_off_language: exclude_from_h2_and_report_share
